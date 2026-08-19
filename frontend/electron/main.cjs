@@ -45,6 +45,8 @@ function startGoServer() {
 
 function createWindow() {
   const iconPath = path.join(__dirname, '..', 'public', 'icon.png');
+  const windowIcon = fs.existsSync(iconPath) ? iconPath : undefined;
+
   mainWindow = new BrowserWindow({
     width: 1380,
     height: 900,
@@ -53,7 +55,8 @@ function createWindow() {
     frame: false, // Frameless window with custom titlebar
     titleBarStyle: 'hidden',
     backgroundColor: '#0f172a',
-    icon: iconPath,
+    show: true,
+    ...(windowIcon ? { icon: windowIcon } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
