@@ -645,3 +645,176 @@ export function generateExactDemoBackCard() {
 
   return canvas.toDataURL('image/png', 1.0);
 }
+
+/**
+ * Render Preset CR80 PVC Template to High-Res Data URL
+ */
+export function renderPresetTemplateToDataUrl(tmpl, side = 'front') {
+  return new Promise((resolve) => {
+    const scale = 4;
+    const width = Math.round(337.5 * scale);
+    const height = Math.round(212.5 * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    if (tmpl.gradient && tmpl.gradient.includes('linear-gradient')) {
+      const grad = ctx.createLinearGradient(0, 0, width, height);
+      if (tmpl.id === 'student-vibrant') {
+        grad.addColorStop(0, '#0284c7');
+        grad.addColorStop(1, '#4f46e5');
+      } else if (tmpl.id === 'vip-executive') {
+        grad.addColorStop(0, '#111827');
+        grad.addColorStop(1, '#1f2937');
+      } else {
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(1, '#1e293b');
+      }
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = tmpl.accentColor || '#0f172a';
+    }
+    ctx.fillRect(0, 0, width, height);
+
+    const elements = side === 'front' ? tmpl.frontElements : (tmpl.backElements || []);
+
+    if (!elements || elements.length === 0) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(20 * scale, 30 * scale, (337.5 - 40) * scale, 40 * scale);
+      
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = `bold ${10 * scale}px "Inter", sans-serif`;
+      ctx.textBaseline = 'top';
+      ctx.fillText('TERMS & CONDITIONS / AUTHORIZED SIGNATURE', 20 * scale, 85 * scale);
+      
+      ctx.font = `500 ${8 * scale}px "Inter", sans-serif`;
+      ctx.fillText(`This card is the property of ${tmpl.title || 'the issuer'}.`, 20 * scale, 110 * scale);
+      ctx.fillText('If found, please return immediately to security or nearest office.', 20 * scale, 125 * scale);
+
+      ctx.fillStyle = tmpl.accentColor || '#38bdf8';
+      ctx.fillRect(20 * scale, 160 * scale, 120 * scale, 4 * scale);
+
+      resolve(canvas.toDataURL('image/png', 1.0));
+      return;
+    }
+
+    const imagePromises = [];
+
+    elements.forEach(el => {
+      if (el.type === 'shape') {
+        ctx.fillStyle = el.fill || tmpl.accentColor || '#ffffff';
+        ctx.fillRect(el.x * scale, el.y * scale, el.width * scale, el.height * scale);
+      } else if (el.type === 'text') {
+        ctx.fillStyle = el.color || '#ffffff';
+        const weight = el.fontWeight || '400';
+        const fontSize = (el.fontSize || 12) * scale;
+        ctx.font = `${weight} ${fontSize}px "Inter", system-ui, sans-serif`;
+        ctx.textBaseline = 'top';
+        ctx.fillText(el.content, el.x * scale, el.y * scale);
+      } else if (el.type === 'barcode') {
+        const bx = el.x * scale;
+        const by = el.y * scale;
+        const bw = el.width * scale;
+        const bh = el.height * scale;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(bx, by, bw, bh);
+        ctx.fillStyle = '#000000';
+        let currX = bx + 10;
+        const val = el.value || '12345678';
+        for (let i = 0; i < val.length; i++) {
+          const charCode = val.charCodeAt(i);
+          const barW = (charCode % 3) + 2;
+          ctx.fillRect(currX, by + 6, barW * scale * 0.7, bh - 24);
+          currX += (barW + 2) * scale * 0.7;
+        }
+        ctx.font = `bold ${9 * scale}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(val, bx + bw / 2, by + bh - 4);
+        ctx.textAlign = 'left';
+      } else if (el.type === 'qr') {
+        const qx = el.x * scale;
+        const qy = el.y * scale;
+        const qw = el.width * scale;
+        const qh = el.height * scale;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(qx, qy, qw, qh);
+        ctx.fillStyle = '#000000';
+        
+        const drawFinder = (x, y, s) => {
+          ctx.fillRect(x, y, s, s);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(x + s * 0.15, y + s * 0.15, s * 0.7, s * 0.7);
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(x + s * 0.3, y + s * 0.3, s * 0.4, s * 0.4);
+        };
+        const findS = qw * 0.28;
+        drawFinder(qx + 4, qy + 4, findS);
+        drawFinder(qx + qw - findS - 4, qy + 4, findS);
+        drawFinder(qx + 4, qy + qh - findS - 4, findS);
+
+        const str = el.value || 'QR';
+        const gridSize = 12;
+        const cellW = (qw - 8) / gridSize;
+        for (let r = 0; r < gridSize; r++) {
+          for (let c = 0; c < gridSize; c++) {
+            if ((r < 4 && c < 4) || (r < 4 && c > 7) || (r > 7 && c < 4)) continue;
+            if ((str.charCodeAt((r * gridSize + c) % str.length) + r + c) % 2 === 0) {
+              ctx.fillRect(qx + 4 + c * cellW, qy + 4 + r * cellW, cellW - 0.5, cellW - 0.5);
+            }
+          }
+        }
+      } else if (el.type === 'image') {
+        const ix = el.x * scale;
+        const iy = el.y * scale;
+        const iw = el.width * scale;
+        const ih = el.height * scale;
+        const radius = (el.borderRadius || 0) * scale;
+
+        const imgP = new Promise((resImg) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            ctx.save();
+            if (radius > 0) {
+              ctx.beginPath();
+              if (ctx.roundRect) {
+                ctx.roundRect(ix, iy, iw, ih, radius);
+              } else {
+                ctx.rect(ix, iy, iw, ih);
+              }
+              ctx.clip();
+            }
+            ctx.drawImage(img, ix, iy, iw, ih);
+            ctx.restore();
+            resImg();
+          };
+          img.onerror = () => {
+            ctx.save();
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(ix, iy, iw, ih);
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(ix + iw / 2, iy + ih * 0.4, iw * 0.25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(ix + iw / 2, iy + ih * 1.1, iw * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            resImg();
+          };
+          img.src = el.src;
+        });
+        imagePromises.push(imgP);
+      }
+    });
+
+    Promise.all(imagePromises).then(() => {
+      resolve(canvas.toDataURL('image/png', 1.0));
+    });
+  });
+}

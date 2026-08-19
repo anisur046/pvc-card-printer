@@ -15,7 +15,7 @@ import JsBarcode from 'jsbarcode';
 import { jsPDF } from 'jspdf';
 import * as htmlToImage from 'html-to-image';
 import { renderPdfToImageDataUrl } from './utils/pdfRenderer';
-import { generateExactDemoFrontCard, generateExactDemoBackCard, cropAadhaarSides } from './utils/aadhaarCardGenerator';
+import { generateExactDemoFrontCard, generateExactDemoBackCard, cropAadhaarSides, renderPresetTemplateToDataUrl } from './utils/aadhaarCardGenerator';
 import { Sparkles, Layers, RotateCw, Save, CheckCircle, Upload, FolderOpen } from 'lucide-react';
 import './App.css';
 
@@ -89,7 +89,9 @@ export default function App() {
 
   const handleOpenPrintModal = () => {
     if (!frontCardImage && !backCardImage) {
-      generateDemoAadhaarCards();
+      showNotify('Please browse or select a card file to print.');
+      setIsBrowseModalOpen(true);
+      return;
     }
     setIsPrintModalOpen(true);
   };
@@ -187,8 +189,8 @@ export default function App() {
       setBackCardImage(cropped.backImage || rawFileSrc);
       showNotify('e-Aadhaar Card Rendered!');
     } else {
-      generateDemoAadhaarCards();
-      showNotify('Generated Aadhaar Output Preview!');
+      showNotify('Please select or browse an e-Aadhaar PDF or card file first.');
+      setIsBrowseModalOpen(true);
     }
   };
 
@@ -197,6 +199,21 @@ export default function App() {
     if (frontImage) setFrontCardImage(frontImage);
     if (backImage) setBackCardImage(backImage);
     showNotify('Front & Back Aadhaar card graphics loaded!');
+  };
+
+  // Handle Template Selection from Preset Library
+  const handleSelectTemplate = async (tmpl) => {
+    showNotify(`Applying template: ${tmpl.title}...`);
+    const frontUrl = await renderPresetTemplateToDataUrl(tmpl, 'front');
+    const backUrl = await renderPresetTemplateToDataUrl(tmpl, 'back');
+
+    setFrontCardImage(frontUrl);
+    setBackCardImage(backUrl);
+    setFrontElements(tmpl.frontElements || []);
+    setBackElements(tmpl.backElements || []);
+    setFrontConfig({ bgColor: tmpl.accentColor, bgGradient: tmpl.gradient });
+    setBackConfig({ bgColor: '#0f172a', bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' });
+    showNotify(`Applied template: ${tmpl.title}`);
   };
 
   // Add Element
@@ -433,7 +450,7 @@ export default function App() {
       <TemplateModal 
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
-        onSelectTemplate={(tmpl) => showNotify(`Selected ${tmpl.title}`)}
+        onSelectTemplate={handleSelectTemplate}
       />
 
       {/* High-Resolution PVC Print Mount for Electron & Printer Spooling */}
