@@ -1,0 +1,509 @@
+/* ==========================================================================
+   PVC CARD PRINTER - DESIGN SYSTEM & STUDIO STYLES
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  --bg-dark: #090d16;
+  --bg-panel: rgba(15, 23, 42, 0.75);
+  --bg-panel-solid: #0f172a;
+  --bg-card-hover: rgba(30, 41, 59, 0.8);
+  --border-panel: rgba(255, 255, 255, 0.1);
+  --border-focus: #6366f1;
+
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-purple: #a855f7;
+  --accent-pink: #ec4899;
+  --accent-amber: #f59e0b;
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --cr80-ratio: 1.5857; /* 85.6mm / 53.98mm */
+  --shadow-panel: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --glass-blur: blur(16px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #090d16 70%);
+}
+
+/* Navbar */
+.navbar {
+  height: 64px;
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border-panel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+}
+
+.brand-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #ffffff, #cbd5e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Main Studio Layout */
+.studio-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Floating / Left Toolbar */
+.toolbar-panel {
+  width: 72px;
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--border-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 12px;
+  z-index: 90;
+}
+
+.tool-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  border-color: var(--border-panel);
+  transform: translateY(-2px);
+}
+
+.tool-btn.active {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Workspace Canvas Viewport */
+.canvas-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: auto;
+  padding: 40px;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.canvas-controls-bar {
+  position: absolute;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-panel);
+  padding: 6px 12px;
+  border-radius: 30px;
+  box-shadow: var(--shadow-panel);
+  z-index: 80;
+}
+
+/* 3D Card Container */
+.card-perspective-container {
+  perspective: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.card-wrapper-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-wrapper-3d.flipped {
+  transform: rotateY(180deg);
+}
+
+/* Physical CR80 Dimensions */
+/* Landscape: 85.6mm x 53.98mm => 640px x 403px default scaling */
+.pvc-card {
+  position: relative;
+  border-radius: 16px; /* CR80 rounded corners */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  backface-visibility: hidden;
+  user-select: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.pvc-card.landscape {
+  width: 640px;
+  height: 403.6px;
+}
+
+.pvc-card.portrait {
+  width: 403.6px;
+  height: 640px;
+}
+
+.pvc-card.card-back {
+  transform: rotateY(180deg);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Hologram & Sheen Overlays */
+.hologram-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.4;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 0, 128, 0.2) 20%,
+    rgba(0, 255, 255, 0.3) 40%,
+    rgba(255, 255, 0, 0.2) 60%,
+    rgba(128, 0, 255, 0.2) 80%,
+    transparent 100%
+  );
+  mix-blend-mode: color-dodge;
+  animation: shimmerHolo 6s ease-in-out infinite alternate;
+}
+
+@keyframes shimmerHolo {
+  0% { opacity: 0.2; transform: scale(1) translate(-2%, -2%); }
+  100% { opacity: 0.5; transform: scale(1.05) translate(2%, 2%); }
+}
+
+.glossy-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 51;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 50%
+  );
+}
+
+/* Element Styling on Canvas */
+.canvas-element {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  cursor: move;
+  border: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.canvas-element.selected {
+  border-color: var(--accent-cyan);
+  outline: 2px dashed rgba(6, 182, 212, 0.6);
+  outline-offset: 2px;
+}
+
+.canvas-element .delete-handle {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  z-index: 100;
+}
+
+/* Right Inspector Panel */
+.inspector-panel {
+  width: 320px;
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--border-panel);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 90;
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-panel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.inspector-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-panel);
+}
+
+.section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--border-panel);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Button System */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.6);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border-color: var(--border-panel);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover {
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-card {
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border-panel);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-panel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-panel);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Print Rules - CR80 Physical PVC Printer Specifications */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 85.6mm;
+    height: 53.98mm;
+  }
+  @page {
+    size: 85.6mm 53.98mm;
+    margin: 0;
+  }
+}

@@ -1,0 +1,11 @@
+# Logs & Temp
+*.log
+scratch/
+.idea/
+.vscode/
+*.tmp
+
+# Dependencies & Builds
+frontend/node_modules/
+frontend/dist/
+frontend/dist-electron/
